@@ -1,0 +1,237 @@
+
+
+To see all available databases, in your terminal type show dbs.
+show dbs
+
+Create a new database called "blog":
+use blog
+
+
+Method 1
+You can create a collection using the createCollection() database method.
+
+db.createCollection("posts")
+
+
+Method 2
+You can also create a collection during the insert process.
+
+db.posts.insertOne(object)
+
+Remember: In MongoDB, a collection is not actually created until it gets content!
+
+
+
+
+There are 2 methods to insert documents into a MongoDB database.
+
+
+insertOne()
+insertMany()
+
+
+db.posts.insertOne({
+  title: "Post Title 1",
+  body: "Body of post.",
+  category: "News",
+  likes: 1,
+  tags: ["news", "events"],
+  date: Date()
+})
+
+
+db.posts.insertMany([  
+  {
+    title: "Post Title 2",
+    body: "Body of post.",
+    category: "Event",
+    likes: 2,
+    tags: ["news", "events"],
+    date: Date()
+  },
+  {
+    title: "Post Title 3",
+    body: "Body of post.",
+    category: "Technology",
+    likes: 3,
+    tags: ["news", "events"],
+    date: Date()
+  },
+  {
+    title: "Post Title 4",
+    body: "Body of post.",
+    category: "Event",
+    likes: 4,
+    tags: ["news", "events"],
+    date: Date()
+  }
+])
+
+
+Response on single insert:
+{
+  acknowledged: true,
+  insertedId: ObjectId('68a24142afa4e6587089b03d')
+}
+
+
+Response on multiple insert:
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('68a2416eafa4e6587089b03e'),
+    '1': ObjectId('68a2416eafa4e6587089b03f'),
+    '2': ObjectId('68a2416eafa4e6587089b040')
+  }
+}
+
+
+
+
+
+==> There are 2 methods to find and select data from a MongoDB collection, find() and findOne().
+
+
+find()
+To select data from a collection in MongoDB, we can use the find() method.
+This method accepts a query object. If left empty, all documents will be returned.
+
+
+findOne()
+To select only one document, we can use the findOne() method.
+This method accepts a query object. If left empty, it will return the first document it finds.
+
+
+
+db.posts.find( {category: "News"} )
+
+db.posts.findOne( {category: "News"} )
+
+
+
+==> Projection
+Both find methods accept a second parameter called projection.
+This parameter is an object that describes which fields to include in the results.
+
+
+* This example will only display the title and date fields in the results.
+We use a 1 to include a field and 0 to exclude a field.
+
+
+db.posts.find({}, {title: 1, date: 1})
+
+
+
+* Notice that the _id field is also included. This field is always included unless specifically excluded.
+
+db.posts.find({}, {_id: 0, title: 1, date: 1})
+
+
+* Note: You cannot use both 0 and 1 in the same object. The only exception is the _id field. You should either specify the fields you would like to include or the fields you would like to exclude.
+db.posts.find({}, {_id: 0, title: 1, date: 1, data:0})
+MongoServerError[Location31254]: Cannot do exclusion on field data in inclusion projection
+
+
+blog> db.posts.find( { title: "Post Title 1" },{title:1, category:0} ) 
+MongoServerError[Location31254]: Cannot do exclusion on field category in inclusion projection
+
+blog> db.posts.find( { title: "Post Title 1" },{title:0, category:1} ) 
+MongoServerError[Location31253]: Cannot do inclusion on field category in exclusion projection
+
+
+
+==> Update Document
+To update an existing document we can use the updateOne() or updateMany() methods.
+
+
+updateOne()
+The updateOne() method will update the first document that is found matching the provided query.
+Let's see what the "like" count for the post with the title of "Post Title 1":
+
+
+
+Now let's update the "likes" on this post to 2. To do this, we need to use the $set operator.
+
+db.posts.updateOne( { title: "Post Title 1" }, { $set: { likes: 2 } } ) 
+
+
+Response on update:
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+Note: First object works as where, other object is for setting the values.
+If updateOne is used with first blank object than it will not update anything.
+db.posts.updateOne( {}, { $set: { likes: 2 } } ) 
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 0,
+  upsertedCount: 0
+}
+
+
+if first object is blank with updateMany that means all data to be updated.
+db.posts.updateMany( {}, { $set: { likes: 2 } } ) 
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 4,
+  modifiedCount: 2,
+  upsertedCount: 0
+}
+
+
+
+* Update the document, but if not found insert it:
+
+db.posts.updateOne( 
+  { title: "Post Title 5" }, 
+  {
+    $set: 
+      {
+        title: "Post Title 5",
+        body: "Body of post.",
+        category: "Event",
+        likes: 5,
+        tags: ["news", "events"],
+        date: Date()
+      }
+  }, 
+  { upsert: true }
+)
+
+
+==> Delete Documents
+We can delete documents by using the methods deleteOne() or deleteMany().
+These methods accept a query object. The matching documents will be deleted.
+
+
+deleteOne()
+The deleteOne() method will delete the first document that matches the query provided.
+
+
+db.posts.deleteOne({ title: "Post Title 5" })
+
+Response:
+db.posts.deleteOne({ title: "Post Title 5" })
+{ acknowledged: true, deletedCount: 0 }
+
+
+db.posts.deleteOne({ title: "Post Title 4" })
+{ acknowledged: true, deletedCount: 1 }
+
+
+
+
+
+
+
+
+
