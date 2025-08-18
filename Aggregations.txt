@@ -1,0 +1,126 @@
+Step 1: Create Sample Collections
+🎯 Main Collection: orders
+db.orders.insertMany([
+  { _id: 1, customerId: 101, item: "Laptop", qty: 1, price: 1000, category: "Electronics" },
+  { _id: 2, customerId: 102, item: "Book", qty: 3, price: 15, category: "Stationery" },
+  { _id: 3, customerId: 101, item: "Phone", qty: 2, price: 700, category: "Electronics" },
+  { _id: 4, customerId: 103, item: "Pen", qty: 10, price: 2, category: "Stationery" }
+])
+
+📁 Related Collection: customers
+db.customers.insertMany([
+  { _id: 101, name: "Alice", city: "New York" },
+  { _id: 102, name: "Bob", city: "London" },
+  { _id: 103, name: "Charlie", city: "Paris" }
+])
+
+🔍 Aggregation Operator Examples
+1️⃣ $match – Filter documents
+db.orders.aggregate([
+  { $match: { category: "Electronics" } }
+])
+
+
+Filters orders to only those in the "Electronics" category.
+
+2️⃣ $group – Group and summarize
+db.orders.aggregate([
+  {
+    $group: {
+      _id: "$category",
+      totalRevenue: { $sum: { $multiply: ["$qty", "$price"] } },
+      totalItems: { $sum: "$qty" }
+    }
+  }
+])
+
+
+Groups orders by category and calculates total revenue and item count.
+
+3️⃣ $sort – Sort documents
+db.orders.aggregate([
+  { $sort: { price: -1 } }
+])
+
+
+Sorts orders by price in descending order.
+
+4️⃣ $limit – Limit result count
+db.orders.aggregate([
+  { $sort: { price: -1 } },
+  { $limit: 2 }
+])
+
+
+Returns top 2 most expensive orders.
+
+5️⃣ $project – Include/transform fields
+db.orders.aggregate([
+  {
+    $project: {
+      item: 1,
+      totalPrice: { $multiply: ["$qty", "$price"] },
+      _id: 0
+    }
+  }
+])
+
+
+Projects a new field totalPrice and hides _id.
+
+6️⃣ $addFields – Add or modify fields
+db.orders.aggregate([
+  {
+    $addFields: {
+      status: { $cond: { if: { $gt: ["$price", 500] }, then: "Premium", else: "Standard" } }
+    }
+  }
+])
+
+
+Adds a new field status based on price.
+
+7️⃣ $count – Count matching documents
+db.orders.aggregate([
+  { $match: { category: "Electronics" } },
+  { $count: "electronic_orders" }
+])
+
+
+Counts number of orders in the "Electronics" category.
+
+8️⃣ $lookup – Join with another collection
+db.orders.aggregate([
+  {
+    $lookup: {
+      from: "customers",
+      localField: "customerId",
+      foreignField: "_id",
+      as: "customerInfo"
+    }
+  }
+])
+
+
+Joins orders with customer data from the customers collection.
+
+9️⃣ $out – Export results to a new collection
+db.orders.aggregate([
+  { $match: { category: "Electronics" } },
+  { $out: "electronicOrders" }
+])
+
+
+Writes the result of the aggregation into a new collection called electronicOrders.
+
+✅ Summary Table
+Operator	Purpose
+$match	Filter documents
+$group	Aggregate values by a field
+$sort	Sort documents
+$limit	Restrict result count
+$project	Include or transform fields
+$addFields	Add new fields to each document
+$count	Return number of matching documents
+$lookup	Perform a left outer join with another collection
+$out	Write results to a new collection

@@ -1,0 +1,72 @@
+
+
+
+Field Update Operators
+
+ Step 1: Create employees collection
+db.employees.insertMany([
+  { name: "Alice", age: 28, role: "developer" },
+  { name: "Bob", age: 35, role: "manager" },
+  { name: "Charlie", age: 30 }
+])
+
+ Operator: $set – Set a specific field value
+db.employees.updateOne(
+  { name: "Charlie" },
+  { $set: { role: "designer" } }
+)
+
+ Operator: $inc – Increment a number field
+db.employees.updateOne(
+  { name: "Alice" },
+  { $inc: { age: 1 } }  // Increases age by 1
+)
+
+ Operator: $rename – Rename a field
+db.employees.updateOne(
+  { name: "Bob" },
+  { $rename: { "role": "position" } }
+)
+
+ Operator: $unset – Remove a field
+db.employees.updateOne(
+  { name: "Charlie" },
+  { $unset: { role: "" } }
+)
+
+ Operator: $currentDate – Set current date/time
+db.employees.updateOne(
+  { name: "Alice" },
+  { $currentDate: { lastModified: true } }
+)
+
+ Array Update Operators
+ Step 1: Create projects collection
+db.projects.insertMany([
+  { name: "Project A", team: ["Alice", "Bob"] },
+  { name: "Project B", team: ["Charlie"] }
+])
+
+ Operator: $push – Add an element to an array
+db.projects.updateOne(
+  { name: "Project B" },
+  { $push: { team: "Dave" } }
+)
+
+ Operator: $addToSet – Add element if not already present
+db.projects.updateOne(
+  { name: "Project A" },
+  { $addToSet: { team: "Eve" } }
+)
+
+ Operator: $pop – Remove first (-1) or last (1) element
+db.projects.updateOne(
+  { name: "Project A" },
+  { $pop: { team: -1 } } // Removes first team member
+)
+
+ Operator: $pull – Remove elements that match a condition
+db.projects.updateOne(
+  { name: "Project A" },
+  { $pull: { team: "Bob" } }
+)

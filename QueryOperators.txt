@@ -1,0 +1,120 @@
+Operators
+
+
+use operatorExamplesDB
+
+
+
+db.products.insertMany([
+  { name: "Laptop", price: 1000, category: "Electronics" },
+  { name: "Phone", price: 700, category: "Electronics" },
+  { name: "Book", price: 20, category: "Stationery" },
+  { name: "Pen", price: 2, category: "Stationery" }
+])
+
+
+
+$eq (equal)
+
+db.products.find({ price: { $eq: 700 } })
+
+
+$ne (not equal)
+
+db.products.find({ category: { $ne: "Electronics" } })
+
+
+$gt (greater than)
+
+db.products.find({ price: { $gt: 100 } })
+
+
+$gte (greater than or equal)
+
+db.products.find({ price: { $gte: 700 } })
+
+
+$lt (less than)
+
+db.products.find({ price: { $lt: 100 } })
+
+
+$lte (less than or equal)
+
+db.products.find({ price: { $lte: 20 } })
+
+
+$in (value in array)
+
+db.products.find({ category: { $in: ["Electronics", "Office"] } })
+
+
+
+
+2.  Logical Operators Collection
+
+Step 1: Insert documents
+
+db.users.insertMany([
+  { name: "Alice", age: 25, role: "admin" },
+  { name: "Bob", age: 30, role: "user" },
+  { name: "Charlie", age: 35, role: "editor" },
+  { name: "Dave", age: 28, role: "admin" }
+])
+
+Step 2: Query Examples
+
+$and
+
+db.users.find({ $and: [ { age: { $gt: 26 } }, { role: "admin" } ] })
+
+
+$or
+
+db.users.find({ $or: [ { role: "admin" }, { age: { $lt: 30 } } ] })
+
+
+$nor (neither condition is true)
+
+db.users.find({ $nor: [ { role: "admin" }, { age: { $gt: 30 } } ] })
+
+
+$not (negate a condition)
+
+db.users.find({ age: { $not: { $gt: 30 } } })
+
+
+
+
+3.  Evaluation Operators Collection
+
+Step 1: Insert documents
+db.articles.insertMany([
+  { title: "MongoDB Tutorial", content: "Learn MongoDB with examples." },
+  { title: "JavaScript Guide", content: "Explore JS in depth." },
+  { title: "Regex in Mongo", content: "Using regular expressions in MongoDB." }
+])
+
+Step 2: Query Examples
+
+$regex
+
+db.articles.find({ title: { $regex: /^Mongo/ } })
+
+
+$text
+First, create a text index:
+
+db.articles.createIndex({ content: "text" })
+
+
+Then perform the search:
+
+db.articles.find({ $text: { $search: "MongoDB" } })
+
+
+$where
+
+db.articles.find({ $where: "this.title.length > 15" })
+
+
